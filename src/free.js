@@ -1,5 +1,5 @@
 const { functions, patch } = require('./fl-compatibility')
-const { of, map } = functions
+const { of, map, ap } = functions
 
 // data Free i a
 //   = Ap { x: (Free i b), y: (Free i (b -> a)) }
@@ -136,7 +136,7 @@ Free.prototype.foldMap = function(f, m) {
   return m.chainRec((next, done, v) => v.cata({
     Pure: (x) => map(of(m, x), done),
     Lift: (x, g) => map(f(x), (a) => done(g(a))),
-    Ap: (x, y) => map(y.foldMap(f, m).ap(x.foldMap(f, m)), done),
+    Ap: (x, y) => map(ap(y.foldMap(f, m), x.foldMap(f, m)), done),
     Chain: (x, g) => map(x.foldMap(f, m), (a) => next(g(a))),
   }), this)
 }
