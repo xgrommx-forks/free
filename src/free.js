@@ -1,3 +1,6 @@
+const { functions, patch } = require('./fl-compatibility')
+const { map } = functions
+
 // data Free i a
 //   = Ap { x: (Free i b), y: (Free i (b -> a)) }
 //   | Pure { x: a }
@@ -71,7 +74,6 @@ if (Function.prototype.map == null) {
 }
 
 const compose = (f, g) => (x) => f(g(x))
-const map = (f) => (v) => v.map(f)
 const id = x => x
 
 /* istanbul ignore next */
@@ -99,14 +101,14 @@ Free.prototype.map = function(f) {
   return this.cata({
     Pure: (x) => Free.Pure(f(x)),
     Lift: (x, g) => Free.Lift(x, compose(f, g)),
-    Ap: (x, y) => Free.Ap(x, y.map(map(f))),
-    Chain: (x, g) => Free.Chain(x, (a) => g(a).map(f)),
+    Ap: (x, y) => Free.Ap(x, map(y, (a) => map(a, f))),
+    Chain: (x, g) => Free.Chain(x, (a) => map(g(a), f)),
   })
 }
 
 Free.prototype.ap = function(y) {
   return this.cata({
-    Pure: (f) => y.map(f),
+    Pure: (f) => map(y, f),
     Ap: () => Free.Ap(y, this),
     Lift: () => Free.Ap(y, this),
     Chain: () => Free.Ap(y, this),
@@ -132,10 +134,10 @@ Free.prototype.retract = function(m) {
 
 Free.prototype.foldMap = function(f, m) {
   return m.chainRec((next, done, v) => v.cata({
-    Pure: (x) => m.of(x).map(done),
-    Lift: (x, g) => f(x).map(g).map(done),
-    Ap: (x, y) => y.foldMap(f, m).ap(x.foldMap(f, m)).map(done),
-    Chain: (x, g) => x.foldMap(f, m).map(g).map(next),
+    Pure: (x) => map(m.of(x), done),
+    Lift: (x, g) => map(f(x), (a) => done(g(a))),
+    Ap: (x, y) => map(y.foldMap(f, m).ap(x.foldMap(f, m)), done),
+    Chain: (x, g) => map(x.foldMap(f, m), (a) => next(g(a))),
   }), this)
 }
 
@@ -149,5 +151,7 @@ const chainRecDone = (value) => ({ done: true, value })
 Free.chainRec = (f, i) => f(chainRecNext, chainRecDone, i).chain(
   ({ done, value }) => done ? Free.of(value) : Free.chainRec(f, value)
 )
+
+patch(Free)
 
 module.exports = Free
