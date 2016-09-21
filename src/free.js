@@ -1,5 +1,5 @@
 const { functions, patch } = require('./fl-compatibility')
-const { of, map, ap } = functions
+const { of, map, ap, chain } = functions
 
 // data Free i a
 //   = Ap { x: (Free i b), y: (Free i (b -> a)) }
@@ -120,7 +120,7 @@ Free.prototype.chain = function(f) {
     Pure: (x) => f(x),
     Ap: () => Free.Chain(this, f),
     Lift: () => Free.Chain(this, f),
-    Chain: (x, g) => Free.Chain(x, (v) => g(v).chain(f)),
+    Chain: (x, g) => Free.Chain(x, (v) => chain(g(v), f)),
   })
 }
 
@@ -148,7 +148,8 @@ Free.prototype.graft = function(f) {
 const chainRecNext = (value) => ({ done: false, value })
 const chainRecDone = (value) => ({ done: true, value })
 
-Free.chainRec = (f, i) => f(chainRecNext, chainRecDone, i).chain(
+Free.chainRec = (f, i) => chain(
+  f(chainRecNext, chainRecDone, i),
   ({ done, value }) => done ? Free.of(value) : Free.chainRec(f, value)
 )
 
