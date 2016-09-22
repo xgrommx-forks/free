@@ -23,7 +23,7 @@ test('Check for concurrency', (t) => {
   }
   let orders = { start: [], end: [] }
   ap(
-    shout('out.ap', 10),
+    shout('out.ap', 10).ap(Free.of((a) => a)),
     lift3(
       pear3,
       shout('out.ap', 500),
