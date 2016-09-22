@@ -1,6 +1,7 @@
 const fl = require('fantasy-land')
 const flCompatibilityDefinition = [
   { flName: fl['of'], srcName: 'of', isStatic: true },
+  { flName: fl['chainRec'], srcName: 'chainRec', isStatic: true },
   { flName: fl['map'], srcName: 'map', isStatic: false },
   { flName: fl['ap'], srcName: 'ap', isStatic: false },
   { flName: fl['chain'], srcName: 'chain', isStatic: false },
