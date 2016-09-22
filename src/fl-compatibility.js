@@ -31,8 +31,15 @@ const functions = flCompatibilityDefinition.reduce((res, definition) => {
 
 const patch = (constructor) => {
   for (let definition of flCompatibilityDefinition) {
-    constructor.prototype[fl[definition.name]] = constructor[definition.name]
-    constructor[fl[definition.name]] = constructor[definition.name]
+    if (constructor.prototype[definition.srcName]) {
+      constructor.prototype[definition.flName] = constructor.prototype[definition.srcName]
+      if (definition.couldBeInConstructor) {
+        constructor[definition.flName] = constructor.prototype[definition.srcName]
+      }
+    }
+    if (constructor[definition.srcName]) {
+      constructor[definition.flName] = constructor[definition.srcName]
+    }
   }
 }
 

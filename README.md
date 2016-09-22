@@ -11,7 +11,7 @@ Free implements [Functor](https://github.com/fantasyland/fantasy-land#functor), 
 
 - Free.prototype.`map :: Free i a -> (a -> b) -> Free i b`
 - Free.`of :: a -> Free i a`
-- Free.prototype.`ap :: Free i (a -> b) -> Free i a -> Free i b`
+- Free.prototype.`ap :: Free i a -> Free i (a -> b) -> Free i b`
 - Free.prototype.`chain :: Free i a -> (a -> Free i b) -> Free i b`
 
 

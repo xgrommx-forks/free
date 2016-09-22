@@ -4,7 +4,7 @@ const { Free, Future } = require('./lib')
 test('Check for concurrency', (t) => {
   const shout = (tag, ms) => Free.liftF({tag: `${tag}.${ms}`, ms})
   const pear3 = x => y => z => [x, y, z]
-  const ap = (v, f) => f.ap(v)
+  const ap = (v, f) => v.ap(f)
   const lift2 = (f, a, b) => {
     return ap(b, a.map(function(a) {
       return function(b) {
