@@ -7,6 +7,7 @@ const flCompatibilityDefinition = [
   { flName: fl['chain'], srcName: 'chain', isStatic: false },
 ]
 
+/* istanbul ignore next */
 const makeFunction = (methodName, fallbackMethodName, isStatic) => (obj, ...args) => {
   if (obj[methodName]) {
     return obj[methodName](...args)
