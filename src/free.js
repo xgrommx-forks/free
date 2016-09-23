@@ -1,3 +1,4 @@
+const fl = require('fantasy-land')
 const { functions, patch } = require('./fl-compatibility')
 const { of, map, ap, chain } = functions
 
@@ -60,9 +61,9 @@ Free.Lift = Lift
 Free.Chain = Chain
 
 /* istanbul ignore else */
-if (Function.prototype.map == null) {
+if (Function.prototype[fl.map] == null) {
   // eslint-disable-next-line no-extend-native
-  Object.defineProperty(Function.prototype, 'map', {
+  Object.defineProperty(Function.prototype, fl.map, {
     value: function(g) {
       const f = this
       return function(x) { return g(f(x)) }
@@ -135,9 +136,9 @@ Free.prototype.retract = function(m) {
 Free.prototype.foldMap = function(f, m) {
   return m.chainRec((next, done, v) => v.cata({
     Pure: (x) => map(of(m, x), done),
-    Lift: (x, g) => map(f(x), (a) => done(g(a))),
+    Lift: (x, g) => map(f(x), compose(done, g)),
     Ap: (x, y) => map(ap(x.foldMap(f, m), y.foldMap(f, m)), done),
-    Chain: (x, g) => map(x.foldMap(f, m), (a) => next(g(a))),
+    Chain: (x, g) => map(x.foldMap(f, m), compose(next, g)),
   }), this)
 }
 

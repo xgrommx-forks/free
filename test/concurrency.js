@@ -1,19 +1,18 @@
 const { test } = require('tap')
-const { Free, Future } = require('./lib')
+const { Free, Future, ap, map } = require('./lib')
 
 test('Check for concurrency', (t) => {
   const shout = (tag, ms) => Free.liftF({tag: `${tag}.${ms}`, ms})
   const pear3 = x => y => z => [x, y, z]
-  const ap = (v, f) => v.ap(f)
   const lift2 = (f, a, b) => {
-    return ap(b, a.map(function(a) {
+    return ap(b, map(a, function(a) {
       return function(b) {
         return f(a)(b)
       }
     }))
   }
   const lift3 = (f, a, b, c) => {
-    return ap(c, ap(b, a.map(function(a) {
+    return ap(c, ap(b, map(a, function(a) {
       return function(b) {
         return function(c) {
           return f(a)(b)(c)
